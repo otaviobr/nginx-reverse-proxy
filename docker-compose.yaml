@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  nginx:
+    build:
+      context: nginx
+    image: otaviosantosbr/nginx
+    tty: true
+    restart: always
+    ports:
+      - "8080:80"
+    container_name: nginx
+    networks:
+      - node-network
+    depends_on:
+      app:
+        condition: service_started
+
+  app:
+    build:
+      context: node
+    image: otaviosantosbr/app-node
+    tty: true
+    restart: always
+    container_name: app
+    ports:
+      - "3000:3000"
+    networks:
+      - node-network
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 2s
+      timeout: 2s
+      retries: 50
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    build:
+      context: mysql
+    image: otaviosantosbr/mysql
+    container_name: db
+    restart: always
+    command: --innodb-use-native-aio=0;
+    tty: true
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - node-network
+    healthcheck:
+      test: ["CMD", 'mysqladmin', 'ping', '--host=localhost', '--user=root', '--password=root' ]
+      interval: 2s
+      timeout: 2s
+      retries: 50
+
+networks:
+  node-network:
+    driver: bridge
