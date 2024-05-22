@@ -20,7 +20,7 @@ const TryConnect = () =>
         console.log("Error getting connection: " + err);
         rej(err);
       }
-    
+
       res(connection);
     });
   });
@@ -57,6 +57,10 @@ app.get("/", async (req, res) => {
     console.log("ConnectDatabaseError: " + error);
     res.send(errorMessage);
   }
+});
+
+app.get("/health", (req, res) => {
+  res.send("health!");
 });
 
 app.listen(port, () => {

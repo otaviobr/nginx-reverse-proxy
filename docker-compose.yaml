@@ -30,9 +30,9 @@ services:
     networks:
       - node-network
     healthcheck:
-      test: ["CMD", "service", "nginx", "status"]
+      test: ["CMD", "curl", "--fail", "-G", "http://localhost:3000/health"]
       interval: 2s
-      timeout: 2s
+      timeout: 5s
       retries: 50
     depends_on:
       db:
