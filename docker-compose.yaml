@@ -23,6 +23,8 @@ services:
     tty: true
     restart: always
     container_name: app
+        volumes:
+      - ./node:/usr/src/app
     ports:
       - "3000:3000"
     networks:
